@@ -38,16 +38,25 @@
               <h6 class="card-subtitle mb-2 text-muted">{{ review.date }}</h6>
               <p class="card-text">{{ review.comment }}</p>
 
-              {% if user.is_authenticated and user == review.user %}
-                <a class="btn btn-primary"
-                   href="{% url 'movies.edit_review' id=template_data.movie.id review_id=review.id %}">
-                  Edit
-                </a>
-                <a class="btn btn-danger"
-                   href="{% url 'movies.delete_review' id=template_data.movie.id review_id=review.id %}">
-                  Delete
-                </a>
-              {% endif %}
+              <div class="d-flex gap-2">
+                {# Existing owner controls #}
+                {% if user.is_authenticated and user == review.user %}
+                  <a class="btn btn-primary"
+                     href="{% url 'movies.edit_review' id=template_data.movie.id review_id=review.id %}">Edit</a>
+                  <a class="btn btn-danger"
+                     href="{% url 'movies.delete_review' id=template_data.movie.id review_id=review.id %}">Delete</a>
+                {% endif %}
+
+                {# Report control for all authenticated users #}
+                {% if user.is_authenticated %}
+                  <form method="post"
+                        action="{% url 'movies.report_review' id=template_data.movie.id review_id=review.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="reason" value="">
+                    <button type="submit" class="btn btn-outline-warning">Report</button>
+                  </form>
+                {% endif %}
+              </div>
             </li>
           {% empty %}
             <li class="list-group-item">No reviews yet.</li>
